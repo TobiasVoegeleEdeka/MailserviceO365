@@ -1,0 +1,12 @@
+services:
+  apitest:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: "./test -purge -nats=nats://nats:4222 -count=99 -concurrency=10 -url=http://api:8080/send-email"
+    networks:
+      - mailserviceo365_mailservice-net
+
+networks:
+  mailserviceo365_mailservice-net:
+    external: true

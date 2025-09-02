@@ -1,0 +1,1 @@
+{"Created":"2025-08-04T09:32:45.066773424Z","Name":"EMAIL_WORKER","durable_name":"EMAIL_WORKER","name":"EMAIL_WORKER","deliver_policy":"all","ack_policy":"explicit","ack_wait":30000000000,"max_deliver":-1,"filter_subject":"EMAILS.send","replay_policy":"instant","max_waiting":512,"max_ack_pending":65536,"num_replicas":0,"metadata":{"_nats.req.level":"0"}}
