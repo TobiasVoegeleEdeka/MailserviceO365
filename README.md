@@ -1,5 +1,5 @@
 E-Mail Microservice für Microsoft O365
-Dieser Microservice bietet eine robuste und skalierbare Lösung zum Versenden von E-Mails über die Microsoft Graph API. Er ist als entkoppeltes System konzipiert, das aus einem API-Endpunkt und einem asynchronen Worker-Dienst besteht, um eine hohe Ausfallsicherheit und Performance zu gewährleisten.
+Dieser Microservice stellt eine robuste und skalierbare Lösung zum Versenden von E-Mails über die Microsoft Graph API bereit. Das System ist entkoppelt konzipiert und besteht aus einem API-Endpunkt sowie einem asynchronen Worker-Dienst, um eine hohe Ausfallsicherheit und Performance zu gewährleisten.
 
 Inhaltsverzeichnis
 Architektur
@@ -82,7 +82,7 @@ git clone <repository-url>
 cd MailserviceO365
 
 .env-Datei erstellen:
-Erstellen Sie eine .env-Datei im Hauptverzeichnis und füllen Sie die folgenden Werte aus:
+Im Hauptverzeichnis wird eine .env-Datei erstellt und mit den folgenden Werten gefüllt:
 
 # Docker-Compose-Projektname
 COMPOSE_PROJECT_NAME=mailservice
@@ -103,7 +103,7 @@ DD_ENV=development
 
 Verwendung
 1. Services starten
-Bauen Sie die Docker-Images und starten Sie alle Container:
+Zum Starten werden die Docker-Images gebaut und alle Container gestartet:
 
 docker-compose up --build -d
 
@@ -127,7 +127,7 @@ Alle Absender auflisten:
 ./admin-tool list
 
 3. E-Mail senden (API-Aufruf)
-Senden Sie eine POST-Anfrage an den API-Endpunkt:
+Eine E-Mail wird über eine POST-Anfrage an den API-Endpunkt gesendet:
 
 curl -X POST \
   http://localhost:8080/send-email \
@@ -140,12 +140,12 @@ curl -X POST \
   }'
 
 Monitoring mit Datadog
-Nachdem Sie eine Anfrage gesendet haben, können Sie den gesamten Ablauf in Ihrem Datadog-Account verfolgen:
+Nachdem eine Anfrage gesendet wurde, kann man den gesamten Ablauf im Datadog-Account verfolgen:
 
-Loggen Sie sich bei Datadog ein.
+Login bei Datadog.
 
-Navigieren Sie zu APM > Traces.
+Navigation zu APM > Traces.
 
-Suchen Sie nach Traces des Services email-api.
+Suche nach Traces des Services email-api.
 
-Sie sehen einen verteilten Trace, der die Anfrage vom email-api Service bis zur Verarbeitung im email-worker Service und den Aufrufen an die Datenbank und die Graph API visualisiert.
+Man sieht einen verteilten Trace, der die Anfrage vom email-api Service bis zur Verarbeitung im email-worker Service und den Aufrufen an die Datenbank und die Graph API visualisiert.
