@@ -18,16 +18,19 @@ type Client struct {
 	client *http.Client
 }
 
+// Attachment definiert die Struktur für Anhänge, wie sie vom Worker übergeben werden.
 type Attachment struct {
 	Name     string
 	Content  []byte
 	MimeType string
 }
 
+// oAuthTokenResponse wird verwendet, um die Antwort des Token-Endpunkts zu parsen.
 type oAuthTokenResponse struct {
 	AccessToken string `json:"access_token"`
 }
 
+// emailMessage ist die Hauptstruktur für die an die Graph-API gesendete JSON-Payload.
 type emailMessage struct {
 	Message struct {
 		Subject       string       `json:"subject"`
@@ -53,6 +56,7 @@ type emailAddress struct {
 	Address string `json:"address"`
 }
 
+// attachment ist die interne Struktur für Anhänge im Graph-API-Format.
 type attachment struct {
 	ODataType    string `json:"@odata.type"`
 	Name         string `json:"name"`
@@ -60,6 +64,7 @@ type attachment struct {
 	ContentBytes string `json:"contentBytes"`
 }
 
+// NewClient erstellt eine neue Instanz des Graph-API-Clients.
 func NewClient(cfg *config.Config) *Client {
 	log.Printf("[DEBUG] Graph-Client wird initialisiert mit TenantID: %s, ClientID: %s", cfg.TenantID, cfg.ClientID)
 	return &Client{
@@ -68,6 +73,7 @@ func NewClient(cfg *config.Config) *Client {
 	}
 }
 
+// SendEmail wurde angepasst. Die UserID wurde entfernt, der Absender wird aus der Konfiguration (cfg.SenderEmail) bezogen.
 func (c *Client) SendEmail(
 	recipients, ccRecipients, bccRecipients []string,
 	subject, bodyContent, contentType string,
@@ -78,7 +84,9 @@ func (c *Client) SendEmail(
 		return nil, fmt.Errorf("authentication failed: %w", err)
 	}
 
+	// GEÄNDERT: Die URL wird jetzt mit der SENDER_EMAIL aus der Konfiguration erstellt.
 	graphAPIURL := fmt.Sprintf("https://graph.microsoft.com/v1.0/users/%s/sendMail", c.cfg.SenderEmail)
+	log.Printf("[DEBUG] Sending email via Graph API endpoint: %s", graphAPIURL)
 
 	var toRecipients, ccRecipientsPayload, bccRecipientsPayload []recipient
 	for _, email := range recipients {
@@ -136,6 +144,7 @@ func (c *Client) SendEmail(
 	return c.client.Do(req)
 }
 
+// getAccessToken ruft ein OAuth2-Zugriffstoken von Microsoft Identity Platform ab.
 func (c *Client) getAccessToken() (string, error) {
 	log.Printf("[DEBUG] Versuche Token abzurufen mit TenantID: [%s] und ClientID: [%s]", c.cfg.TenantID, c.cfg.ClientID)
 	tokenURL := fmt.Sprintf("https://login.microsoftonline.com/%s/oauth2/v2.0/token", c.cfg.TenantID)

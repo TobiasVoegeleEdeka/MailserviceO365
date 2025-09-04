@@ -5,11 +5,13 @@ import (
 	"os"
 
 	"email-microservice/internal/config"
+	"email-microservice/internal/db"
 	"email-microservice/internal/graph"
 	natsclient "email-microservice/internal/nats"
 	"email-microservice/internal/worker"
 
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 	"github.com/nats-io/nats.go"
 )
 
@@ -24,6 +26,12 @@ func main() {
 		log.Fatalf("Failed to load configuration: %v", err)
 	}
 
+	// NEU: DB-Config aus der Haupt-Config verwenden
+	dbClient, err := db.NewClient(cfg.DB.Driver, cfg.DB.DSN)
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+
 	natsURL := os.Getenv("NATS_URL")
 	if natsURL == "" {
 		natsURL = nats.DefaultURL
@@ -34,7 +42,8 @@ func main() {
 
 	graphClient := graph.NewClient(cfg)
 
-	emailWorker, err := worker.New(js, graphClient)
+	// dbClient wird an den Worker übergeben
+	emailWorker, err := worker.New(js, graphClient, dbClient)
 	if err != nil {
 		log.Fatalf("Failed to create worker: %v", err)
 	}
