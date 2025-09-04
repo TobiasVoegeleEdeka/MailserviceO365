@@ -1,14 +1,14 @@
 package models
 
-// Attachment definiert die Struktur für E-Mail-Anhänge, wie sie im Job-Payload erwartet wird.
+// Attachment defines the structure for email attachments.
 type Attachment struct {
-	ODataType    string `json:"@odata.type,omitempty"` // Oft "#microsoft.graph.fileAttachment"
+	ODataType    string `json:"@odata.type"`
 	Name         string `json:"name"`
-	ContentBytes string `json:"contentBytes"` // Wichtig: Inhalt wird als Base64-kodierter String erwartet
+	ContentBytes string `json:"contentBytes"`
 	ContentType  string `json:"contentType"`
 }
 
-// EmailJob repräsentiert einen E-Mail-Sendeauftrag, der über NATS empfangen wird.
+// EmailJob represents an email sending job received via NATS.
 type EmailJob struct {
 	Recipients      []string     `json:"recipients"`
 	CcRecipients    []string     `json:"cc_recipients,omitempty"`
@@ -17,17 +17,15 @@ type EmailJob struct {
 	BodyContent     string       `json:"body_content,omitempty"`
 	HtmlBodyContent string       `json:"html_body_content,omitempty"`
 	Attachments     []Attachment `json:"attachments,omitempty"`
+	AppTag          string       `json:"app_tag"`
 
-	// AppTag weist den Auftrag einem konfigurierten Absender-Postfach zu.
-	// Der Tag wird von der aufrufenden Applikation bereitgestellt.
-	AppTag string `json:"app_tag"`
+	// KORREKTUR: Feld zur Aufnahme des Trace-Kontexts von Datadog hinzugefügt.
+	TraceContext map[string]string `json:"trace_context,omitempty"`
 }
 
-// Sender repräsentiert einen Absender-Eintrag aus der Datenbank.
-// In der neuen Konfiguration wird die UserID nicht mehr benötigt.
+// Sender represents a sender entry from the database.
 type Sender struct {
 	ID     int64  `json:"id"`
 	AppTag string `json:"app_tag"`
-
-	Email string `json:"email"`
+	Email  string `json:"email"`
 }

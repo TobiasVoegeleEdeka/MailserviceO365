@@ -37,10 +37,15 @@ services:
     environment:
       - PORT=8080
       - NATS_URL=nats://nats:4222
+      # --- HINZUGEFÜGT: Datadog Konfiguration ---
+      - DD_AGENT_HOST=datadog-agent
+      - DD_ENV=development
+      - DD_SERVICE=email-api
     restart: unless-stopped
     depends_on:
       - nats
       - db
+      - datadog-agent # Stellt sicher, dass der Agent vor der API startet
     networks:
       - mailservice-net
 
@@ -54,17 +59,40 @@ services:
       - CLIENT_ID=84e5a7cb-6a66-4133-ba85-43a1eaf95baf
       - CLIENT_SECRET=Ze38Q~8jSUXiHbMSOqPzcAgbubdD-eHVUw8QDaG9
       - SENDER_EMAIL=EIT_qualitaetsreport@edeka.de
-   
       - DB_DRIVER=postgres
       - DB_DSN=host=db port=5432 user=mailservice_user password=mysecretpassword dbname=mailservice_db sslmode=disable
+      # --- HINZUGEFÜGT: Datadog Konfiguration ---
+      - DD_AGENT_HOST=datadog-agent
+      - DD_ENV=development
+      - DD_SERVICE=email-worker
     restart: unless-stopped
     depends_on:
       - nats
       - db
+      - datadog-agent # Stellt sicher, dass der Agent vor dem Worker startet
     deploy:
       replicas: 1
     networks:
       - mailservice-net
+
+  # --- HINZUGEFÜGT: Datadog Agent Service ---
+  datadog-agent:
+    image: datadog/agent:latest
+    environment:
+      - DD_API_KEY=${DD_API_KEY} # Wird aus der .env-Datei gelesen
+      - DD_APM_ENABLED=true
+      - DD_LOGS_ENABLED=true
+      - DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true
+      - DD_APM_NON_LOCAL_TRAFFIC=true
+    ports:
+      - "8126:8126/tcp" # Port für Traces
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+    networks:
+      - mailservice-net
+    restart: unless-stopped
 
 networks:
   mailservice-net:
@@ -73,3 +101,4 @@ networks:
 volumes:
   nats-data:
   db-data:
+
